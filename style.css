@@ -1,0 +1,272 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.item-card {
+    background-color: white;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+}
+header {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin-bottom: 5px;
+}
+
+header p {
+    color: #555;
+}
+
+main {
+    max-width: 800px;
+    margin: auto;
+}
+
+#postButton {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    background-color: #2563eb;
+    color: white;
+    font-size: 16px;
+}
+
+#postButton:hover {
+    background-color: #1d4ed8;
+}
+
+.item-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.lost {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.found {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+.no-items {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+button {
+    padding: 10px 18px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.item-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+    main {
+        width: 90%;
+        margin: auto;
+    }
+
+    input,
+    textarea,
+    select {
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .item-card {
+        padding: 12px;
+    }
+
+    .item-image {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.dark-mode {
+    background-color: #1f2937;
+    color: white;
+}
+
+.dark-mode header p {
+    color: #d1d5db;
+}
+
+.dark-mode .item-card {
+    background-color: #374151;
+    color: white;
+}
+
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+    background-color: #4b5563;
+    color: white;
+    border: 1px solid #6b7280;
+}
+
+#searchInput {
+    padding: 10px;
+    width: 220px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#clearSearchButton {
+    padding: 10px 15px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+#filterStatus,
+#sortItems {
+    padding: 10px;
+    margin-left: 5px;
+    border-radius: 5px;
+}
+
+.item-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.status {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 5px;
+}
+
+.lost {
+    background-color: #ffdddd;
+    color: #b00020;
+}
+
+.found {
+    background-color: #ddffdd;
+    color: #087f23;
+}
+
+.resolved {
+    background-color: #ddddff;
+    color: #333399;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 15px;
+    }
+
+    #searchInput {
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    #clearSearchButton,
+    #filterStatus,
+    #sortItems {
+        margin: 5px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .item-card {
+        padding: 15px;
+    }
+
+    button {
+        margin-top: 5px;
+    }
+}
+
+#notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: none;
+    font-weight: bold;
+}
+
+#notification.show {
+    display: block;
+}
+
+#about {
+    margin-top: 40px;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#about h2 {
+    margin-bottom: 15px;
+}
+
+footer {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+footer p {
+    margin: 0;
+}
+
+.sort-section {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
