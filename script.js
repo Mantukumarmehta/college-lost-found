@@ -1,3 +1,22 @@
+const supabaseUrl = "https://wgujzhicbowsjijbffty.supabase.co";
+const supabaseKey = "sb_publishable_g17L0FEUseyVPUKcMsujRg_-u-GNjz_";
+
+ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+async function testSupabaseConnection() {
+    const { data, error } = await supabaseClient
+        .from("items")
+        .select("*");
+
+    if (error) {
+        console.error("Supabase connection error:", error);
+    } else {
+        console.log("Supabase connected successfully!", data);
+    }
+}
+
+testSupabaseConnection();
+
 const postButton = document.getElementById("postButton");
 const itemForm = document.getElementById("itemForm");
 const submitButton = document.getElementById("submitButton");
@@ -9,10 +28,37 @@ const cancelButton = document.getElementById("cancelButton");
 const darkModeButton = document.getElementById("darkModeButton");
 const clearAllButton = document.getElementById("clearAllButton");
 const sortItems = document.getElementById("sortItems");
+const clearSearchButton = document.getElementById("clearSearchButton");
 
 // Get saved items, or create an empty list
-let items = JSON.parse(localStorage.getItem("lostFoundItems")) || [];
+let items = [];
 let editingIndex = -1;
+
+async function loadItems() {
+    const { data, error } = await supabaseClient
+        .from("items")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Error loading items:", error);
+        return;
+    }
+
+    items = data;
+    displayItems();
+}
+
+function showNotification(message) {
+    const notification = document.getElementById("notification");
+
+    notification.textContent = message;
+    notification.classList.add("show");
+
+    setTimeout(function () {
+        notification.classList.remove("show");
+    }, 3000);
+}
 
 // Show saved items on the webpage
 function displayItems() {
@@ -63,7 +109,12 @@ if (sortItems.value === "found") {
 }
 
 if (filteredItems.length === 0) {
-    itemsContainer.innerHTML = "<p class='no-items'>No items found. Try a different search.</p>";
+    itemsContainer.innerHTML = `
+        <div class="no-items">
+            <h3>📭 No items found</h3>
+            <p>Try changing your search or filter.</p>
+        </div>
+    `;
     return;
 }
 
@@ -75,13 +126,16 @@ newItem.innerHTML = `
     ${item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image">` : ""}
     <h3>📦 ${item.name}</h3>
     <p><strong>Description:</strong> ${item.description}</p>
-    <p><strong>Status:</strong> ${item.status}</p>
+    <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
     <p><strong>Location:</strong> ${item.location}</p>
     
     <button class="contactButton">Contact</button>
     <button class="editButton">Edit</button>
     <button class="deleteButton">Delete</button>
+    
+   ${item.status !== "RESOLVED" ? '<button class="resolveButton">✅ Mark as Resolved</button>' : ""} 
 `;
+
 const contactButton = newItem.querySelector(".contactButton");
 
 contactButton.addEventListener("click", function () {
@@ -105,31 +159,39 @@ editButton.addEventListener("click", function () {
 
 const deleteButton = newItem.querySelector(".deleteButton");
 
-        deleteButton.addEventListener("click", function () {
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this item?"
-    );
+   deleteButton.addEventListener("click", function () {
+    const confirmDelete = confirm("Are you sure you want to delete this item?");
 
     if (confirmDelete) {
-        const itemIndex = items.indexOf(item);
+        items.splice(items.indexOf(item), 1);
 
-        items.splice(itemIndex, 1);
-
-        localStorage.setItem(
-            "lostFoundItems",
-            JSON.stringify(items)
-        );
+        localStorage.setItem("lostFoundItems", JSON.stringify(items));
 
         displayItems();
-    }
-});
 
-        itemsContainer.appendChild(newItem);
+        showNotification("Item deleted successfully!");
+    }
+});     
+
+const resolveButton = newItem.querySelector(".resolveButton");
+
+if (resolveButton) {
+    resolveButton.addEventListener("click", function () {
+        item.status = "RESOLVED";
+
+        localStorage.setItem("lostFoundItems", JSON.stringify(items));
+
+        displayItems();
     });
 }
 
-// Show items when the page opens
-displayItems();
+itemsContainer.appendChild(newItem);
+
+    });
+}
+
+// Load items from Supabase when the page opens
+loadItems();
 
 // Show the form
 postButton.addEventListener("click", function () {
@@ -193,19 +255,26 @@ submitButton.addEventListener("click", function () {
 
     // Hide the form
     itemForm.style.display = "none";
-
-    alert("Item posted successfully!");
+showNotification("Item posted successfully! 🎉");
+    
 });
 searchInput.addEventListener("input", function () {
+    displayItems();
+});
+
+clearSearchButton.addEventListener("click", function () {
+    searchInput.value = "";
     displayItems();
 });
 
 filterStatus.addEventListener("change", function () {
     displayItems();
 });
+
 sortItems.addEventListener("change", function () {
      displayItems()
 });
+
 
 if (localStorage.getItem("darkMode") === "enabled") {
     document.body.classList.add("dark-mode");
