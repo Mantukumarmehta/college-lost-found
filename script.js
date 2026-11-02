@@ -1,3 +1,22 @@
+const supabaseUrl = "https://wgujzhicbowsjijbffty.supabase.co/rest/v1/";
+const supabaseKey = "sb_publishable_g17L0FEUseyVPUKcMsujRg_-u-GNjz_";
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+async function testSupabaseConnection() {
+    const { data, error } = await supabase
+        .from("items")
+        .select("*");
+
+    if (error) {
+        console.error("Supabase connection error:", error);
+    } else {
+        console.log("Supabase connected successfully!", data);
+    }
+}
+
+testSupabaseConnection();
+
 const postButton = document.getElementById("postButton");
 const itemForm = document.getElementById("itemForm");
 const submitButton = document.getElementById("submitButton");
