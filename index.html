@@ -52,22 +52,25 @@
 <input
     type="text"
     id="searchInput"
-    placeholder="Search for an item..."
->
+    placeholder="Search for an item...">
+    <button id="clearSearchButton">Clear</button>
 
 <select id="filterStatus">
     <option value="ALL">All Items</option>
     <option value="LOST">Lost Items</option>
     <option value="FOUND">Found Items</option>
+    <option value="RESOLVED">Resolved Items</option>
 </select>
 
-<label for="sortItems">Sort:</label>
+<div class="sort-section">
+    <label for="sortItems">Sort:</label>
 
-<select id="sortItems">
-    <option value="newest">Newest First</option>
-    <option value="lost">Lost First</option>
-    <option value="found">Found First</option>
-</select>
+    <select id="sortItems">
+        <option value="newest">Newest First</option>
+        <option value="lost">Lost First</option>
+        <option value="found">Found First</option>
+    </select>
+</div>
 
 <div id="itemsContainer">
 
@@ -84,8 +87,30 @@
     </div>
 
 </div>
-
     
 </main>
-    <script src="script.js"></script>
+    
+    <section id="about">
+    <h2>About College Lost & Found</h2>
+    
+    <p>
+        College Lost & Found is a simple application that helps students
+        report lost items and share information about found belongings.
+    </p>
+
+    <p>
+        Students can post items, search for them, contact the owner,
+        and mark items as resolved when they are returned.
+    </p>
+</section>
+
+<footer>
+    <p>© 2026 College Lost & Found | Built by a B.Tech Student Mantu Kumar</p>
+</footer>
+
+<div id="notification"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 </body>
+</html>
