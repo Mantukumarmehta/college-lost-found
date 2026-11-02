@@ -1,4 +1,4 @@
-const supabaseUrl = "https://wgujzhicbowsjijbffty.supabase.co";
+nconst supabaseUrl = "https://wgujzhicbowsjijbffty.supabase.co";
 const supabaseKey = "sb_publishable_g17L0FEUseyVPUKcMsujRg_-u-GNjz_";
 
  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -251,7 +251,6 @@ submitButton.addEventListener("click", async function () {
             contact: itemContact
         }
     ])
-    .select();
 
 if (error) {
     console.error("Error saving item:", error);
