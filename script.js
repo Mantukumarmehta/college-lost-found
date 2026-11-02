@@ -204,7 +204,7 @@ cancelButton.addEventListener("click", function () {
 });
 
 // Add a new item
-submitButton.addEventListener("click", function () {
+submitButton.addEventListener("click", async function () {
     const itemName = document.getElementById("itemName").value;
     const itemDescription = document.getElementById("itemDescription").value;
     const itemStatus = document.getElementById("itemStatus").value;
@@ -240,11 +240,28 @@ submitButton.addEventListener("click", function () {
     editingIndex = -1;
 }
 
-    // Save the list in the browser
-    localStorage.setItem("lostFoundItems", JSON.stringify(items));
+    const { data, error } = await supabaseClient
+    .from("items")
+    .insert([
+        {
+            name: itemName,
+            description: itemDescription,
+            status: itemStatus,
+            location: itemLocation,
+            contact: itemContact
+        }
+    ])
+    .select();
 
-    // Update the webpage
-    displayItems();
+if (error) {
+    console.error("Error saving item:", error);
+    alert("Could not save the item. Please try again.");
+    return;
+}
+
+await loadItems();
+
+alert("Item posted successfully!");
 
     // Clear the form
     document.getElementById("itemName").value = "";
