@@ -9,22 +9,10 @@ const cancelButton = document.getElementById("cancelButton");
 const darkModeButton = document.getElementById("darkModeButton");
 const clearAllButton = document.getElementById("clearAllButton");
 const sortItems = document.getElementById("sortItems");
-const clearSearchButton = document.getElementById("clearSearchButton");
 
 // Get saved items, or create an empty list
 let items = JSON.parse(localStorage.getItem("lostFoundItems")) || [];
 let editingIndex = -1;
-
-function showNotification(message) {
-    const notification = document.getElementById("notification");
-
-    notification.textContent = message;
-    notification.classList.add("show");
-
-    setTimeout(function () {
-        notification.classList.remove("show");
-    }, 3000);
-}
 
 // Show saved items on the webpage
 function displayItems() {
@@ -75,12 +63,7 @@ if (sortItems.value === "found") {
 }
 
 if (filteredItems.length === 0) {
-    itemsContainer.innerHTML = `
-        <div class="no-items">
-            <h3>📭 No items found</h3>
-            <p>Try changing your search or filter.</p>
-        </div>
-    `;
+    itemsContainer.innerHTML = "<p class='no-items'>No items found. Try a different search.</p>";
     return;
 }
 
@@ -92,16 +75,13 @@ newItem.innerHTML = `
     ${item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image">` : ""}
     <h3>📦 ${item.name}</h3>
     <p><strong>Description:</strong> ${item.description}</p>
-    <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
+    <p><strong>Status:</strong> ${item.status}</p>
     <p><strong>Location:</strong> ${item.location}</p>
     
     <button class="contactButton">Contact</button>
     <button class="editButton">Edit</button>
     <button class="deleteButton">Delete</button>
-    
-   ${item.status !== "RESOLVED" ? '<button class="resolveButton">✅ Mark as Resolved</button>' : ""} 
 `;
-
 const contactButton = newItem.querySelector(".contactButton");
 
 contactButton.addEventListener("click", function () {
@@ -125,34 +105,26 @@ editButton.addEventListener("click", function () {
 
 const deleteButton = newItem.querySelector(".deleteButton");
 
-   deleteButton.addEventListener("click", function () {
-    const confirmDelete = confirm("Are you sure you want to delete this item?");
+        deleteButton.addEventListener("click", function () {
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this item?"
+    );
 
     if (confirmDelete) {
-        items.splice(items.indexOf(item), 1);
+        const itemIndex = items.indexOf(item);
 
-        localStorage.setItem("lostFoundItems", JSON.stringify(items));
+        items.splice(itemIndex, 1);
+
+        localStorage.setItem(
+            "lostFoundItems",
+            JSON.stringify(items)
+        );
 
         displayItems();
-
-        showNotification("Item deleted successfully!");
     }
-});     
+});
 
-const resolveButton = newItem.querySelector(".resolveButton");
-
-if (resolveButton) {
-    resolveButton.addEventListener("click", function () {
-        item.status = "RESOLVED";
-
-        localStorage.setItem("lostFoundItems", JSON.stringify(items));
-
-        displayItems();
-    });
-}
-
-itemsContainer.appendChild(newItem);
-
+        itemsContainer.appendChild(newItem);
     });
 }
 
@@ -221,26 +193,19 @@ submitButton.addEventListener("click", function () {
 
     // Hide the form
     itemForm.style.display = "none";
-showNotification("Item posted successfully! 🎉");
-    
+
+    alert("Item posted successfully!");
 });
 searchInput.addEventListener("input", function () {
-    displayItems();
-});
-
-clearSearchButton.addEventListener("click", function () {
-    searchInput.value = "";
     displayItems();
 });
 
 filterStatus.addEventListener("change", function () {
     displayItems();
 });
-
 sortItems.addEventListener("change", function () {
      displayItems()
 });
-
 
 if (localStorage.getItem("darkMode") === "enabled") {
     document.body.classList.add("dark-mode");
