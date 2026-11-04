@@ -159,29 +159,58 @@ editButton.addEventListener("click", function () {
 
 const deleteButton = newItem.querySelector(".deleteButton");
 
-   deleteButton.addEventListener("click", function () {
+deleteButton.addEventListener("click", async function () {
+
     const confirmDelete = confirm("Are you sure you want to delete this item?");
 
-    if (confirmDelete) {
-        items.splice(items.indexOf(item), 1);
+    if (!confirmDelete) return;
 
-        localStorage.setItem("lostFoundItems", JSON.stringify(items));
+    const { data, error } = await supabaseClient
+        .from("items")
+        .delete()
+        .eq("id", item.id)
+        .select();
 
-        displayItems();
-
-        showNotification("Item deleted successfully!");
+    if (error) {
+        console.error("Delete error:", error);
+        showNotification("Could not delete item!");
+        return;
     }
-});     
+
+    if (!data || data.length === 0) {
+        showNotification("Item not found!");
+        return;
+    }
+
+    items = items.filter(i => i.id !== item.id);
+
+    displayItems();
+
+    showNotification("Item deleted successfully!");
+});
 
 const resolveButton = newItem.querySelector(".resolveButton");
 
 if (resolveButton) {
-    resolveButton.addEventListener("click", function () {
+
+    resolveButton.addEventListener("click", async function () {
+
+        const { error } = await supabaseClient
+            .from("items")
+            .update({ status: "RESOLVED" })
+            .eq("id", item.id);
+
+        if (error) {
+            console.error("Resolve error:", error);
+            showNotification("Could not update item!");
+            return;
+        }
+
         item.status = "RESOLVED";
 
-        localStorage.setItem("lostFoundItems", JSON.stringify(items));
-
         displayItems();
+
+        showNotification("Item marked as resolved!");
     });
 }
 
