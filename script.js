@@ -348,16 +348,19 @@ clearAllButton.addEventListener("click", async function () {
 
     if (!confirmClear) return;
 
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
         .from("items")
         .delete()
-        .gt("id", 0);
+        .gt("id", 0)
+        .select();
 
     if (error) {
         console.error("Clear all error:", error);
         showNotification("Could not delete items!");
         return;
     }
+
+    console.log("Deleted items:", data);
 
     await loadItems();
 
