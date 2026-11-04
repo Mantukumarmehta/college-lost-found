@@ -36,6 +36,28 @@ function updateAdminUI() {
 
     document.getElementById("clearAllButton").style.display =
         isAdmin ? "inline-block" : "none";
+
+    document.getElementById("adminDashboard").style.display =
+        isAdmin ? "block" : "none";
+
+    updateDashboardStats();
+}
+
+// UPDATE DASHBOARD STATISTICS
+
+function updateDashboardStats() {
+
+    document.getElementById("totalItems").textContent =
+        items.length;
+
+    document.getElementById("lostItems").textContent =
+        items.filter(item => item.status === "LOST").length;
+
+    document.getElementById("foundItems").textContent =
+        items.filter(item => item.status === "FOUND").length;
+
+    document.getElementById("resolvedItems").textContent =
+        items.filter(item => item.status === "RESOLVED").length;
 }
 
 // Check login when website opens
@@ -183,8 +205,10 @@ async function loadItems() {
         return;
     }
 
-    items = data;
-    displayItems();
+   items = data;
+   displayItems();
+   updateDashboardStats(); 
+    
 }
 
 function showNotification(message) {
