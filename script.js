@@ -19,6 +19,36 @@ testSupabaseConnection();
 
 const postButton = document.getElementById("postButton");
 const itemForm = document.getElementById("itemForm");
+
+async function uploadItemImage(file) {
+
+    if (!file) return "";
+
+    const fileExt = file.name.split(".").pop();
+
+    const fileName = `${Date.now()}-${Math.random()
+        .toString(36).substring(2)}.${fileExt}`;
+
+    const { error } = await supabaseClient
+        .storage
+        .from("item-images")
+        .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false
+        });
+
+    if (error) {
+        console.error("Image upload error:", error);
+        throw error;
+    }
+
+    const { data } = supabaseClient
+        .storage
+        .from("item-images")
+        .getPublicUrl(fileName);
+
+    return data.publicUrl;
+}
 const submitButton = document.getElementById("submitButton");
 const itemsContainer = document.getElementById("itemsContainer");
 const itemCount = document.getElementById("itemCount");
@@ -240,68 +270,102 @@ submitButton.addEventListener("click", async function () {
     const itemStatus = document.getElementById("itemStatus").value;
     const itemLocation = document.getElementById("itemLocation").value;
     const itemContact = document.getElementById("itemContact").value;
-    const itemImage = document.getElementById("itemImage").value;
+
+    const imageFile = document.getElementById("itemImage").files[0];
 
     if (itemName === "" || itemLocation === "" || itemContact === "") {
         alert("Please enter the item name, location, and contact information.");
         return;
     }
 
-    const itemData = {
-        name: itemName,
-        description: itemDescription,
-        status: itemStatus,
-        location: itemLocation,
-        contact: itemContact
-    };
+    // Check image size and type
+    if (imageFile) {
 
-    let error;
+        if (imageFile.size > 5 * 1024 * 1024) {
+            alert("Image must be smaller than 5 MB.");
+            return;
+        }
 
-    if (editingIndex === -1) {
-
-        // INSERT NEW ITEM
-        const result = await supabaseClient
-            .from("items")
-            .insert([itemData]);
-
-        error = result.error;
-
-    } else {
-
-        // UPDATE EXISTING ITEM
-        const existingItem = items[editingIndex];
-
-        const result = await supabaseClient
-            .from("items")
-            .update(itemData)
-            .eq("id", existingItem.id);
-
-        error = result.error;
+        if (!["image/jpeg", "image/png", "image/webp"].includes(imageFile.type)) {
+            alert("Only JPG, PNG, and WebP images are allowed.");
+            return;
+        }
     }
 
-    if (error) {
-        console.error("Error saving item:", error);
-        alert("Could not save the item. Please try again.");
-        return;
+    try {
+
+        let imageUrl = "";
+
+        // Preserve existing image when editing
+        if (editingIndex !== -1) {
+            imageUrl = items[editingIndex].image || "";
+        }
+
+        // Upload new image if selected
+        if (imageFile) {
+            imageUrl = await uploadItemImage(imageFile);
+        }
+
+        const itemData = {
+            name: itemName,
+            description: itemDescription,
+            status: itemStatus,
+            location: itemLocation,
+            contact: itemContact,
+            image: imageUrl
+        };
+
+        let error;
+
+        if (editingIndex === -1) {
+
+            // INSERT NEW ITEM
+            const result = await supabaseClient
+                .from("items")
+                .insert([itemData]);
+
+            error = result.error;
+
+        } else {
+
+            // UPDATE EXISTING ITEM
+            const existingItem = items[editingIndex];
+
+            const result = await supabaseClient
+                .from("items")
+                .update(itemData)
+                .eq("id", existingItem.id);
+
+            error = result.error;
+        }
+
+        if (error) {
+            console.error("Error saving item:", error);
+            alert("Could not save the item. Please try again.");
+            return;
+        }
+
+        editingIndex = -1;
+
+        await loadItems();
+
+        // Clear form
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemDescription").value = "";
+        document.getElementById("itemLocation").value = "";
+        document.getElementById("itemContact").value = "";
+        document.getElementById("itemImage").value = "";
+
+        itemForm.style.display = "none";
+
+        showNotification("Item saved successfully! 🎉");
+
+    } catch (error) {
+
+        console.error("Error:", error);
+        alert("Something went wrong while uploading or saving the item.");
+
     }
-
-    // Reset editing mode
-    editingIndex = -1;
-
-    // Reload items from Supabase
-    await loadItems();
-
-    // Clear form
-    document.getElementById("itemName").value = "";
-    document.getElementById("itemDescription").value = "";
-    document.getElementById("itemLocation").value = "";
-    document.getElementById("itemContact").value = "";
-    document.getElementById("itemImage").value = "";
-
-    // Hide form
-    itemForm.style.display = "none";
-
-    showNotification("Item saved successfully! 🎉");
 
 });
 
