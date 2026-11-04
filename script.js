@@ -300,9 +300,10 @@ ${isAdmin ? `
 ` : ""}
   `;
 
-const contactButton = newItem.querySelector(".contactButton");
+const editButton = newItem.querySelector(".editButton");
 
-contactButton.addEventListener("click", function () {
+if (editButton) {
+    editButton.addEventListener("click", function () {
     alert("Contact: " + item.contact);
 });
 
@@ -332,9 +333,13 @@ editButton.addEventListener("click", function () {
 
 });
 
+}
+
 const deleteButton = newItem.querySelector(".deleteButton");
 
-deleteButton.addEventListener("click", async function () {
+if (deleteButton) {
+
+    deleteButton.addEventListener("click", async function () {
 
     const confirmDelete = confirm("Are you sure you want to delete this item?");
 
@@ -363,6 +368,8 @@ deleteButton.addEventListener("click", async function () {
 
     showNotification("Item deleted successfully!");
 });
+
+}
 
 const resolveButton = newItem.querySelector(".resolveButton");
 
