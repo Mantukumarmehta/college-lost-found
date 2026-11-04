@@ -12,7 +12,34 @@
     <h1>🔍 College Lost & Found</h1>
     <p>Helping students find their lost belongings.</p>
     <button id="darkModeButton">🌙 Dark Mode</button>
+    <button id="loginButton">Admin Login</button>
+    <button id="logoutButton" style="display:none;">Logout</button>
 </header>
+
+<div id="loginSection" style="display:none;">
+    <h2>Admin Login</h2>
+
+    <form id="adminLoginForm">
+        <input 
+            type="email" 
+            id="adminEmail" 
+            placeholder="Admin Email" 
+            required
+        >
+
+        <input 
+            type="password" 
+            id="adminPassword" 
+            placeholder="Admin Password" 
+            required
+        >
+
+        <button type="submit">Login</button>
+        <button type="button" id="cancelLoginButton">Cancel</button>
+    </form>
+
+    <p id="loginMessage"></p>
+</div>
 
 <main>
 
