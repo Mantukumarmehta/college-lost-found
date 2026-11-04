@@ -300,38 +300,38 @@ ${isAdmin ? `
 ` : ""}
   `;
 
-const editButton = newItem.querySelector(".editButton");
+const contactButton = newItem.querySelector(".contactButton");
 
-if (editButton) {
-    editButton.addEventListener("click", function () {
+contactButton.addEventListener("click", function () {
     alert("Contact: " + item.contact);
 });
 
 const editButton = newItem.querySelector(".editButton");
 
-editButton.addEventListener("click", function () {
+if (editButton) {
 
-    editingIndex = items.indexOf(item);
+    editButton.addEventListener("click", function () {
 
-    document.getElementById("itemName").value = item.name;
-    document.getElementById("itemDescription").value = item.description;
-    document.getElementById("itemStatus").value = item.status;
-    document.getElementById("itemLocation").value = item.location;
-    document.getElementById("itemContact").value = item.contact || "";
+        editingIndex = items.indexOf(item);
 
-    // Show existing image
-    const preview = document.getElementById("currentImagePreview");
+        document.getElementById("itemName").value = item.name;
+        document.getElementById("itemDescription").value = item.description;
+        document.getElementById("itemStatus").value = item.status;
+        document.getElementById("itemLocation").value = item.location;
+        document.getElementById("itemContact").value = item.contact || "";
 
-    if (item.image) {
-        preview.src = item.image;
-        preview.style.display = "block";
-    } else {
-        preview.style.display = "none";
-    }
+        const preview = document.getElementById("currentImagePreview");
 
-    itemForm.style.display = "block";
+        if (item.image) {
+            preview.src = item.image;
+            preview.style.display = "block";
+        } else {
+            preview.style.display = "none";
+        }
 
-});
+        itemForm.style.display = "block";
+
+    });
 
 }
 
