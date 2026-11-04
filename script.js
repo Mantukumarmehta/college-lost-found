@@ -2,6 +2,44 @@ const supabaseUrl = "https://wgujzhicbowsjijbffty.supabase.co";
 const supabaseKey = "sb_publishable_g17L0FEUseyVPUKcMsujRg_-u-GNjz_";
 
  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+ // ADMIN AUTHENTICATION
+
+const adminUserId = "ec711150-630e-4ae8-8ea3-69b7768fa3ab";
+
+let isAdmin = false;
+
+// Check current login session
+async function checkAdminLogin() {
+
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+        console.error("Session error:", error);
+        return;
+    }
+
+    const user = data.session?.user;
+
+    isAdmin = user?.id === adminUserId;
+
+    updateAdminUI();
+}
+
+// Update admin buttons
+function updateAdminUI() {
+
+    document.getElementById("loginButton").style.display =
+        isAdmin ? "none" : "inline-block";
+
+    document.getElementById("logoutButton").style.display =
+        isAdmin ? "inline-block" : "none";
+
+    document.getElementById("clearAllButton").style.display =
+        isAdmin ? "inline-block" : "none";
+}
+
+// Check login when website opens
+checkAdminLogin();
 
 async function testSupabaseConnection() {
     const { data, error } = await supabaseClient
@@ -59,6 +97,76 @@ const darkModeButton = document.getElementById("darkModeButton");
 const clearAllButton = document.getElementById("clearAllButton");
 const sortItems = document.getElementById("sortItems");
 const clearSearchButton = document.getElementById("clearSearchButton");
+// ADMIN LOGIN BUTTON
+
+const loginButton = document.getElementById("loginButton");
+const logoutButton = document.getElementById("logoutButton");
+const loginSection = document.getElementById("loginSection");
+const adminLoginForm = document.getElementById("adminLoginForm");
+const loginMessage = document.getElementById("loginMessage");
+
+loginButton.addEventListener("click", function () {
+    loginSection.style.display = "block";
+});
+
+document.getElementById("cancelLoginButton").addEventListener("click", function () {
+    loginSection.style.display = "none";
+});
+
+// ADMIN LOGIN
+adminLoginForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const email = document.getElementById("adminEmail").value;
+    const password = document.getElementById("adminPassword").value;
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        loginMessage.textContent = "Login failed: " + error.message;
+        return;
+    }
+
+    if (data.user.id !== adminUserId) {
+
+        await supabaseClient.auth.signOut();
+
+        loginMessage.textContent = "This account is not authorized as admin.";
+        return;
+    }
+
+    isAdmin = true;
+
+    updateAdminUI();
+
+    loginSection.style.display = "none";
+
+    adminLoginForm.reset();
+
+    showNotification("Admin login successful!");
+});
+
+// ADMIN LOGOUT
+logoutButton.addEventListener("click", async function () {
+
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        console.error("Logout error:", error);
+        return;
+    }
+
+    isAdmin = false;
+
+    updateAdminUI();
+
+    showNotification("Admin logged out successfully!");
+
+});
 
 // Get saved items, or create an empty list
 let items = [];
