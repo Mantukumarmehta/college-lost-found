@@ -234,6 +234,7 @@ cancelButton.addEventListener("click", function () {
 
 // Add a new item
 submitButton.addEventListener("click", async function () {
+
     const itemName = document.getElementById("itemName").value;
     const itemDescription = document.getElementById("itemDescription").value;
     const itemStatus = document.getElementById("itemStatus").value;
@@ -246,63 +247,64 @@ submitButton.addEventListener("click", async function () {
         return;
     }
 
-    // Create an item object
-    const newItem = {
+    const itemData = {
         name: itemName,
         description: itemDescription,
         status: itemStatus,
         location: itemLocation,
-        contact: itemContact,
-        image: itemImage
-
+        contact: itemContact
     };
 
-    // Add the item to our list
+    let error;
+
     if (editingIndex === -1) {
-    // Add a completely new item
-    items.unshift(newItem);
-} else {
-    // Update the item being edited
-    items[editingIndex] = newItem;
 
-    // Stop editing mode
+        // INSERT NEW ITEM
+        const result = await supabaseClient
+            .from("items")
+            .insert([itemData]);
+
+        error = result.error;
+
+    } else {
+
+        // UPDATE EXISTING ITEM
+        const existingItem = items[editingIndex];
+
+        const result = await supabaseClient
+            .from("items")
+            .update(itemData)
+            .eq("id", existingItem.id);
+
+        error = result.error;
+    }
+
+    if (error) {
+        console.error("Error saving item:", error);
+        alert("Could not save the item. Please try again.");
+        return;
+    }
+
+    // Reset editing mode
     editingIndex = -1;
-}
 
-    const { data, error } = await supabaseClient
-    .from("items")
-    .insert([
-        {
-            name: itemName,
-            description: itemDescription,
-            status: itemStatus,
-            location: itemLocation,
-            contact: itemContact
-        }
-    ])
+    // Reload items from Supabase
+    await loadItems();
 
-if (error) {
-    console.error("Error saving item:", error);
-    alert("Could not save the item. Please try again.");
-    return;
-}
-
-await loadItems();
-
-alert("Item posted successfully!");
-
-    // Clear the form
+    // Clear form
     document.getElementById("itemName").value = "";
     document.getElementById("itemDescription").value = "";
     document.getElementById("itemLocation").value = "";
     document.getElementById("itemContact").value = "";
     document.getElementById("itemImage").value = "";
 
-    // Hide the form
+    // Hide form
     itemForm.style.display = "none";
-showNotification("Item posted successfully! 🎉");
-    
+
+    showNotification("Item saved successfully! 🎉");
+
 });
+
 searchInput.addEventListener("input", function () {
     displayItems();
 });
