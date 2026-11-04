@@ -340,21 +340,27 @@ darkModeButton.addEventListener("click", function () {
     }
 });
 
-clearAllButton.addEventListener("click", function () {
+clearAllButton.addEventListener("click", async function () {
+
     const confirmClear = confirm(
-        "Are you sure you want to delete all items?"
+        "Are you sure you want to delete ALL items?"
     );
 
-    if (confirmClear) {
-        items = [];
+    if (!confirmClear) return;
 
-        localStorage.setItem(
-            "lostFoundItems",
-            JSON.stringify(items)
-        );
+    const { error } = await supabaseClient
+        .from("items")
+        .delete()
+        .gt("id", 0);
 
-        displayItems();
-
-        alert("All items have been deleted.");
+    if (error) {
+        console.error("Clear all error:", error);
+        showNotification("Could not delete items!");
+        return;
     }
+
+    await loadItems();
+
+    showNotification("All items deleted successfully!");
+
 });
