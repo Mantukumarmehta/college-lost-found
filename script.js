@@ -106,6 +106,8 @@ const adminLoginForm = document.getElementById("adminLoginForm");
 const loginMessage = document.getElementById("loginMessage");
 
 loginButton.addEventListener("click", function () {
+    alert("Login button is working!");
+
     loginSection.style.display = "block";
 });
 
