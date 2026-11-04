@@ -175,16 +175,27 @@ contactButton.addEventListener("click", function () {
 const editButton = newItem.querySelector(".editButton");
 
 editButton.addEventListener("click", function () {
-  editingIndex = items.indexOf(item);
+
+    editingIndex = items.indexOf(item);
 
     document.getElementById("itemName").value = item.name;
     document.getElementById("itemDescription").value = item.description;
     document.getElementById("itemStatus").value = item.status;
     document.getElementById("itemLocation").value = item.location;
     document.getElementById("itemContact").value = item.contact || "";
-    document.getElementById("itemImage").value = item.image || "";
+
+    // Show existing image
+    const preview = document.getElementById("currentImagePreview");
+
+    if (item.image) {
+        preview.src = item.image;
+        preview.style.display = "block";
+    } else {
+        preview.style.display = "none";
+    }
 
     itemForm.style.display = "block";
+
 });
 
 const deleteButton = newItem.querySelector(".deleteButton");
