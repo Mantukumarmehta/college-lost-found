@@ -267,12 +267,14 @@ newItem.innerHTML = `
     <p><strong>Status:</strong> <span class="status ${item.status.toLowerCase()}">${item.status}</span></p>
     <p><strong>Location:</strong> ${item.location}</p>
     
-    <button class="contactButton">Contact</button>
+  <button class="contactButton">Contact</button>
+
+${isAdmin ? `
     <button class="editButton">Edit</button>
     <button class="deleteButton">Delete</button>
-    
-   ${item.status !== "RESOLVED" ? '<button class="resolveButton">✅ Mark as Resolved</button>' : ""} 
-`;
+    ${item.status !== "RESOLVED" ? '<button class="resolveButton">✅ Mark as Resolved</button>' : ""}
+` : ""}
+  `;
 
 const contactButton = newItem.querySelector(".contactButton");
 
