@@ -7,6 +7,7 @@ const supabaseKey = "sb_publishable_g17L0FEUseyVPUKcMsujRg_-u-GNjz_";
 const adminUserId = "ec711150-630e-4ae8-8ea3-69b7768fa3ab";
 
 let isAdmin = false;
+let isStudent = false;
 
 // Check current login session
 async function checkAdminLogin() {
@@ -21,6 +22,7 @@ async function checkAdminLogin() {
     const user = data.session?.user;
 
     isAdmin = user?.id === adminUserId;
+    isStudent = Boolean(user && user.id !== adminUserId);
 
     updateAdminUI();
 }
@@ -28,21 +30,28 @@ async function checkAdminLogin() {
 // Update admin buttons
 function updateAdminUI() {
 
-    document.getElementById("loginButton").style.display =
-        isAdmin ? "none" : "inline-block";
+    // Admin Login button
+    loginButton.style.display =
+        (isAdmin || isStudent) ? "none" : "inline-block";
 
-    document.getElementById("logoutButton").style.display =
-        isAdmin ? "inline-block" : "none";
+    // Student Login button
+    studentLoginButton.style.display =
+        (isAdmin || isStudent) ? "none" : "inline-block";
 
+    // Logout button
+    logoutButton.style.display =
+        (isAdmin || isStudent) ? "inline-block" : "none";
+
+    // Clear All button
     document.getElementById("clearAllButton").style.display =
         isAdmin ? "inline-block" : "none";
 
+    // Admin Dashboard
     document.getElementById("adminDashboard").style.display =
         isAdmin ? "block" : "none";
 
     updateDashboardStats();
 }
-
 // UPDATE DASHBOARD STATISTICS
 
 function updateDashboardStats() {
@@ -126,9 +135,96 @@ const logoutButton = document.getElementById("logoutButton");
 const loginSection = document.getElementById("loginSection");
 const adminLoginForm = document.getElementById("adminLoginForm");
 const loginMessage = document.getElementById("loginMessage");
+// STUDENT AUTHENTICATION ELEMENTS
+const studentLoginButton = document.getElementById("studentLoginButton");
+const studentAuthSection = document.getElementById("studentAuthSection");
+const studentSignupForm = document.getElementById("studentSignupForm");
+const studentLoginForm = document.getElementById("studentLoginForm");
+const studentAuthMessage = document.getElementById("studentAuthMessage");
+const closeStudentAuth = document.getElementById("closeStudentAuth");
+
+// STUDENT SIGN UP
+studentSignupForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const email = document.getElementById("studentSignupEmail").value;
+    const password = document.getElementById("studentSignupPassword").value;
+
+    studentAuthMessage.textContent = "Creating your account...";
+
+    const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+        emailRedirectTo: "https://mantukumarmehta.github.io/college-lost-found/"
+    }
+});
+
+    console.log("Student signup response:", data);
+console.log("Student signup error:", error);
+
+    if (error) {
+        studentAuthMessage.textContent = "Sign up failed: " + error.message;
+        return;
+    }
+
+    studentAuthMessage.textContent =
+        "Account created! Please check your email and confirm your account before logging in.";
+
+    studentSignupForm.reset();
+});
+
+// STUDENT LOGIN
+studentLoginForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const email = document.getElementById("studentLoginEmail").value;
+    const password = document.getElementById("studentLoginPassword").value;
+
+    studentAuthMessage.textContent = "Logging in...";
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        studentAuthMessage.textContent = "Login failed: " + error.message;
+        return;
+    }
+
+    if (data.user.id === adminUserId) {
+        studentAuthMessage.textContent =
+            "This is an Admin account. Please use Admin Login.";
+        await supabaseClient.auth.signOut();
+        return;
+    }
+
+    isAdmin = false;
+    isStudent = true;
+
+    updateAdminUI();
+
+    studentAuthSection.style.display = "none";
+
+    studentLoginForm.reset();
+
+    showNotification("Student login successful!");
+});
 
 loginButton.addEventListener("click", function () {
     loginSection.style.display = "block";
+});
+
+// OPEN STUDENT LOGIN / SIGN UP
+studentLoginButton.addEventListener("click", function () {
+    studentAuthSection.style.display = "block";
+});
+
+// CLOSE STUDENT LOGIN / SIGN UP
+closeStudentAuth.addEventListener("click", function () {
+    studentAuthSection.style.display = "none";
 });
 
 document.getElementById("cancelLoginButton").addEventListener("click", function () {
