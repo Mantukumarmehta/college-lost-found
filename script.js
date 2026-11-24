@@ -145,6 +145,16 @@ const closeProfileButton = document.getElementById("closeProfileButton");
 const profileEmail = document.getElementById("profileEmail");
 const profileRole = document.getElementById("profileRole");
 const profileItemCount = document.getElementById("profileItemCount");
+const myPostsButton = document.getElementById("myPostsButton");
+const myPostsSection = document.getElementById("myPostsSection");
+const myPostsList = document.getElementById("myPostsList");
+const myPostsSearch = document.getElementById("myPostsSearch");
+const myPostsFilter = document.getElementById("myPostsFilter");
+const myPostsSort = document.getElementById("myPostsSort");
+
+const postDetailsSection = document.getElementById("postDetailsSection");
+const postDetailsContent = document.getElementById("postDetailsContent");
+const closePostDetails = document.getElementById("closePostDetails");
 const logoutButton = document.getElementById("logoutButton");
 const loginSection = document.getElementById("loginSection");
 const adminLoginForm = document.getElementById("adminLoginForm");
@@ -274,6 +284,217 @@ profileButton.addEventListener("click", async function () {
 closeProfileButton.addEventListener("click", function () {
     profileSection.style.display = "none";
 });
+
+myPostsButton.addEventListener("click", async function () {
+
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        alert("Please log in first.");
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("items")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        alert("Could not load your posts.");
+        return;
+    }
+
+    myPostsList.innerHTML = "";
+
+    if (data.length === 0) {
+        myPostsList.textContent = "You have not posted any items yet.";
+    } else {
+        data.forEach(function (item) {
+
+            const itemCard = document.createElement("div");
+            itemCard.className = "my-post-card";
+            itemCard.dataset.itemName = item.name.toLowerCase();
+            itemCard.dataset.itemStatus = item.status.toUpperCase();
+            itemCard.dataset.createdAt = item.created_at;
+
+            const itemName = document.createElement("h4");
+            itemName.textContent = item.name;
+
+            const itemDescription = document.createElement("p");
+            itemDescription.textContent = item.description;
+
+            const itemStatus = document.createElement("p");
+            const itemDate = document.createElement("p");
+            itemDate.textContent = "Posted: " +
+            new Date(item.created_at).toLocaleDateString();
+            itemStatus.textContent = "Status: " + item.status;
+
+            itemStatus.className =
+               "my-post-status " + String(item.status).toLowerCase();
+
+            itemCard.appendChild(itemName);
+            itemCard.appendChild(itemDescription);
+            itemCard.appendChild(itemStatus);
+            itemCard.appendChild(itemDate);
+
+            if (item.image) {
+                const image = document.createElement("img");
+                image.src = item.image;
+                image.alt = item.name;
+                image.style.maxWidth = "150px";
+                itemCard.appendChild(image);
+            }
+
+            const detailsButton = document.createElement("button");
+detailsButton.textContent = "View Details";
+
+detailsButton.addEventListener("click", function () {
+
+    postDetailsContent.innerHTML = "";
+
+    const detailsName = document.createElement("h3");
+    detailsName.textContent = item.name;
+
+    const detailsDescription = document.createElement("p");
+    detailsDescription.textContent = "Description: " + item.description;
+
+    const detailsStatus = document.createElement("p");
+    detailsStatus.textContent = "Status: " + item.status;
+
+    const detailsLocation = document.createElement("p");
+    detailsLocation.textContent = "Location: " + item.location;
+
+    const detailsContact = document.createElement("p");
+    detailsContact.textContent = "Contact: " + item.contact;
+
+    postDetailsContent.appendChild(detailsName);
+    postDetailsContent.appendChild(detailsDescription);
+    postDetailsContent.appendChild(detailsStatus);
+    postDetailsContent.appendChild(detailsLocation);
+    postDetailsContent.appendChild(detailsContact);
+
+    postDetailsSection.style.display = "block";
+});
+
+itemCard.appendChild(detailsButton);
+if (!isAdmin) {
+    const editMyPostButton = document.createElement("button");
+    editMyPostButton.textContent = "Edit My Post";
+
+    editMyPostButton.addEventListener("click", function () {
+        editingIndex = items.findIndex(
+            existingItem => existingItem.id === item.id
+        );
+
+        if (editingIndex === -1) {
+            alert("Item not found.");
+            return;
+        }
+
+        document.getElementById("itemName").value = item.name;
+        document.getElementById("itemDescription").value = item.description;
+        document.getElementById("itemStatus").value = item.status;
+        document.getElementById("itemLocation").value = item.location;
+        document.getElementById("itemContact").value = item.contact;
+
+        itemForm.style.display = "block";
+        profileSection.style.display = "none";
+        myPostsSection.style.display = "none";
+    });
+
+    itemCard.appendChild(editMyPostButton);
+    const deleteMyPostButton = document.createElement("button");
+deleteMyPostButton.textContent = "Delete My Post";
+
+deleteMyPostButton.addEventListener("click", async function () {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this item?"
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("items")
+        .delete()
+        .eq("id", item.id)
+        .eq("user_id", (await supabaseClient.auth.getUser()).data.user.id);
+
+    if (error) {
+        alert("Could not delete item: " + error.message);
+        return;
+    }
+
+    alert("Your item was deleted successfully!");
+
+    await loadItems();
+
+    myPostsButton.click();
+});
+
+itemCard.appendChild(deleteMyPostButton);
+}
+
+            myPostsList.appendChild(itemCard);
+        });
+    }
+
+    myPostsSection.style.display = "block";
+});
+
+closePostDetails.addEventListener("click", function () {
+    postDetailsSection.style.display = "none";
+});
+
+function filterMyPosts() {
+
+    const searchValue = myPostsSearch.value.toLowerCase();
+    const selectedStatus = myPostsFilter.value;
+    const sortOrder = myPostsSort.value;
+
+    const itemCards = Array.from(
+        myPostsList.querySelectorAll(".my-post-card")
+    );
+
+    // Search and status filter
+    itemCards.forEach(function (card) {
+
+        const itemName = card.dataset.itemName;
+        const itemStatus = card.dataset.itemStatus;
+
+        const matchesSearch = itemName.includes(searchValue);
+
+        const matchesStatus =
+            selectedStatus === "ALL" ||
+            itemStatus === selectedStatus;
+
+        card.style.display =
+            matchesSearch && matchesStatus ? "block" : "none";
+    });
+
+    // Sort by date
+    itemCards.sort(function (a, b) {
+
+        const dateA = new Date(a.dataset.createdAt).getTime();
+        const dateB = new Date(b.dataset.createdAt).getTime();
+
+        return sortOrder === "newest"
+            ? dateB - dateA
+            : dateA - dateB;
+    });
+
+    itemCards.forEach(function (card) {
+        myPostsList.appendChild(card);
+    });
+}
+
+myPostsSearch.addEventListener("input", filterMyPosts);
+myPostsFilter.addEventListener("change", filterMyPosts);
+myPostsSort.addEventListener("change", filterMyPosts);
 
 document.getElementById("cancelLoginButton").addEventListener("click", function () {
     loginSection.style.display = "none";

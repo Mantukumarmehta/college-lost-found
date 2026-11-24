@@ -27,6 +27,35 @@
 
     <p><strong>Account Role:</strong> <span id="profileRole"></span></p>
     <p><strong>Items Posted:</strong> <span id="profileItemCount">0</span></p>
+    <button id="myPostsButton">My Posts</button>
+
+<div id="myPostsSection" style="display:none;">
+    <h3>My Posted Items</h3>
+    <div id="myPostsList"></div>
+</div>
+
+<input
+    type="text"
+    id="myPostsSearch"
+    placeholder="Search your posted items...">
+
+    <select id="myPostsFilter">
+    <option value="ALL">All Items</option>
+    <option value="LOST">LOST</option>
+    <option value="FOUND">FOUND</option>
+    <option value="RESOLVED">RESOLVED</option>
+</select>
+
+<select id="myPostsSort">
+    <option value="newest">Newest First</option>
+    <option value="oldest">Oldest First</option>
+</select>
+
+<div id="postDetailsSection" style="display:none;">
+    <h3>Item Details</h3>
+    <div id="postDetailsContent"></div>
+    <button id="closePostDetails">Close Details</button>
+</div>
 
     <button id="closeProfileButton">Close Profile</button>
 </div>

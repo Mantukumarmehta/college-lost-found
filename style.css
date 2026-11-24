@@ -470,3 +470,64 @@ footer p {
     color: #1f2937;
 }
 
+.my-post-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.my-post-status.lost {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.my-post-status.found {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.my-post-status.resolved {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* My Posts Dashboard */
+
+.my-post-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    color: #1f2937;
+}
+
+.my-post-card h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #1f2937;
+}
+
+.my-post-card p {
+    margin: 8px 0;
+    color: #4b5563;
+}
+
+.my-post-card img {
+    max-width: 180px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.my-post-card button {
+    margin: 6px 5px 0 0;
+    padding: 9px 15px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
