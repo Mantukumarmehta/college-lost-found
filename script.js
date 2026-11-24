@@ -32,6 +32,9 @@ async function checkAdminLogin() {
 // Update admin buttons
 function updateAdminUI() {
 
+    profileButton.style.display =
+    (isAdmin || isStudent) ? "inline-block" : "none";
+
     document.getElementById("accountEmail").style.display =
     (isAdmin || isStudent) ? "inline-block" : "none";
 
@@ -136,6 +139,12 @@ const clearSearchButton = document.getElementById("clearSearchButton");
 // ADMIN LOGIN BUTTON
 
 const loginButton = document.getElementById("loginButton");
+const profileButton = document.getElementById("profileButton");
+const profileSection = document.getElementById("profileSection");
+const closeProfileButton = document.getElementById("closeProfileButton");
+const profileEmail = document.getElementById("profileEmail");
+const profileRole = document.getElementById("profileRole");
+const profileItemCount = document.getElementById("profileItemCount");
 const logoutButton = document.getElementById("logoutButton");
 const loginSection = document.getElementById("loginSection");
 const adminLoginForm = document.getElementById("adminLoginForm");
@@ -232,6 +241,38 @@ studentLoginButton.addEventListener("click", function () {
 // CLOSE STUDENT LOGIN / SIGN UP
 closeStudentAuth.addEventListener("click", function () {
     studentAuthSection.style.display = "none";
+});
+
+profileButton.addEventListener("click", async function () {
+
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        alert("Please log in first.");
+        return;
+    }
+
+    profileEmail.textContent = user.email;
+    profileRole.textContent = isAdmin ? "Admin" : "Student";
+
+    const { count, error } = await supabaseClient
+        .from("items")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+    if (error) {
+        alert("Could not load item count.");
+        return;
+    }
+
+    profileItemCount.textContent = count ?? 0;
+
+    profileSection.style.display = "block";
+});
+
+closeProfileButton.addEventListener("click", function () {
+    profileSection.style.display = "none";
 });
 
 document.getElementById("cancelLoginButton").addEventListener("click", function () {
@@ -565,23 +606,32 @@ submitButton.addEventListener("click", async function () {
             imageUrl = await uploadItemImage(imageFile);
         }
 
-        const itemData = {
-            name: itemName,
-            description: itemDescription,
-            status: itemStatus,
-            location: itemLocation,
-            contact: itemContact,
-            image: imageUrl
-        };
+       const itemData = {
+    name: itemName,
+    description: itemDescription,
+    status: itemStatus,
+    location: itemLocation,
+    contact: itemContact,
+    image: imageUrl,
+    
+    }; 
 
         let error;
 
         if (editingIndex === -1) {
 
             // INSERT NEW ITEM
-            const result = await supabaseClient
-                .from("items")
-                .insert([itemData]);
+            const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
+
+if (userError || !user) {
+    alert("Please log in before posting.");
+    return;
+}
+
+const result = await supabaseClient
+    .from("items")
+    .insert([{ ...itemData, user_id: user.id }]);
 
             error = result.error;
 
