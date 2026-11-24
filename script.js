@@ -20,6 +20,8 @@ async function checkAdminLogin() {
     }
 
     const user = data.session?.user;
+    document.getElementById("accountEmail").textContent =
+    user?.email || "";
 
     isAdmin = user?.id === adminUserId;
     isStudent = Boolean(user && user.id !== adminUserId);
@@ -29,6 +31,9 @@ async function checkAdminLogin() {
 
 // Update admin buttons
 function updateAdminUI() {
+
+    document.getElementById("accountEmail").style.display =
+    (isAdmin || isStudent) ? "inline-block" : "none";
 
     // Admin Login button
     loginButton.style.display =
@@ -204,6 +209,8 @@ studentLoginForm.addEventListener("submit", async function (event) {
     isAdmin = false;
     isStudent = true;
 
+    document.getElementById("accountEmail").textContent = data.user.email;
+
     updateAdminUI();
 
     studentAuthSection.style.display = "none";
@@ -259,6 +266,8 @@ adminLoginForm.addEventListener("submit", async function (event) {
 
     isAdmin = true;
 
+    document.getElementById("accountEmail").textContent = data.user.email;
+
     updateAdminUI();
 
     loginSection.style.display = "none";
@@ -279,6 +288,8 @@ logoutButton.addEventListener("click", async function () {
     }
 
     isAdmin = false;
+    isStudent = false;
+    document.getElementById("accountEmail").textContent = "";
 
     updateAdminUI();
 

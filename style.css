@@ -422,3 +422,15 @@ footer p {
     }
 }
 
+#accountEmail {
+    display: inline-block;
+    padding: 8px 14px;
+    margin: 5px;
+    border-radius: 20px;
+    background-color: #e0f2fe;
+    color: #075985;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #bae6fd;
+}
+
